@@ -47,15 +47,13 @@ class PlaylistTest {
     }
 
     @Test
-    @DisplayName("Adicionar música além da capacidade retorna false")
-    void deveRetornarFalseAoAdicionarNaPlaylistCheia() {
-        for (int i = 0; i < 100; i++) {
+    @DisplayName("ArrayList permite adicionar mais de 100 músicas sem limite fixo")
+    void devePermitirMaisDeCemMusicas() {
+        for (int i = 0; i < 101; i++) {
             assertTrue(playlist.adicionar(new Musica("Música " + i, "Artista", 100)));
         }
 
-        assertEquals(100, playlist.getQuantidade());
-        assertFalse(playlist.adicionar(new Musica("101ª Música", "Artista", 100)));
-        assertEquals(100, playlist.getQuantidade());
+        assertEquals(101, playlist.getQuantidade());
     }
 
     @Test
@@ -86,7 +84,7 @@ class PlaylistTest {
     }
 
     @Test
-    @DisplayName("Remoção de posição válida reorganiza o array sem deixar buraco")
+    @DisplayName("Remoção de posição válida reorganiza a lista sem deixar buraco")
     void deveRemoverEReorganizarPlaylist() {
         playlist.adicionar(musica1);
         playlist.adicionar(musica2);

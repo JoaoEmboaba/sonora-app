@@ -41,6 +41,18 @@ public class App {
                 case 8:
                     demonstrarPlaylist();
                     break;
+                case 9:
+                    listarUsuarios();
+                    break;
+                case 10:
+                    seguirUsuario();
+                    break;
+                case 11:
+                    deixarDeSeguirUsuario();
+                    break;
+                case 12:
+                    listarSeguindo();
+                    break;
                 case 0:
                     executando = false;
                     System.out.println("Encerrando o Sonora.");
@@ -74,6 +86,10 @@ public class App {
         System.out.println("6 - Reproduzir uma música");
         System.out.println("7 - Listar acervo");
         System.out.println("8 - Demonstração da Fase 02");
+        System.out.println("9 - Listar usuários");
+        System.out.println("10 - Seguir usuário");
+        System.out.println("11 - Deixar de seguir usuário");
+        System.out.println("12 - Listar quem estou seguindo");
         System.out.println("0 - Sair");
     }
 
@@ -264,6 +280,84 @@ public class App {
             System.out.println("Erro na demonstração: " + e.getMessage());
         } finally {
             System.out.println("Demonstração finalizada.");
+        }
+    }
+
+
+    private static void listarUsuarios() {
+        System.out.println();
+        System.out.println("=== Usuários (" + plataforma.getTotalUsuarios() + ") ===");
+
+        if (plataforma.getTotalUsuarios() == 0) {
+            System.out.println("Nenhum usuário cadastrado.");
+            return;
+        }
+
+        for (Usuario usuario : plataforma.getUsuarios()) {
+            String marcador = usuario == usuarioAtual ? " (usuário atual)" : "";
+            System.out.println(usuario + marcador);
+        }
+    }
+
+    private static void seguirUsuario() {
+        try {
+            validarUsuarioAtual();
+
+            int id = lerInteiro("ID do usuário que deseja seguir: ");
+            Usuario outro = plataforma.buscarUsuarioPorId(id);
+
+            if (outro == null) {
+                throw new IllegalArgumentException("Usuário não encontrado.");
+            }
+
+            usuarioAtual.seguir(outro);
+            System.out.println("Agora você segue: " + outro.getNome());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println("Não foi possível seguir o usuário: " + e.getMessage());
+        }
+    }
+
+    private static void deixarDeSeguirUsuario() {
+        try {
+            validarUsuarioAtual();
+
+            int id = lerInteiro("ID do usuário que deseja deixar de seguir: ");
+            Usuario outro = plataforma.buscarUsuarioPorId(id);
+
+            if (outro == null) {
+                throw new IllegalArgumentException("Usuário não encontrado.");
+            }
+
+            usuarioAtual.deixarDeSeguir(outro);
+            System.out.println("Operação concluída para: " + outro.getNome());
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.out.println("Não foi possível deixar de seguir o usuário: " + e.getMessage());
+        }
+    }
+
+    private static void listarSeguindo() {
+        try {
+            validarUsuarioAtual();
+
+            System.out.println();
+            System.out.println("=== Seguindo (" + usuarioAtual.getQuantidadeSeguindo() + ") ===");
+
+            if (usuarioAtual.getQuantidadeSeguindo() == 0) {
+                System.out.println("Você não segue nenhum usuário.");
+                return;
+            }
+
+            for (Usuario usuario : usuarioAtual.getSeguindo()) {
+                System.out.println(usuario);
+            }
+        } catch (IllegalStateException e) {
+            System.out.println("Não foi possível listar: " + e.getMessage());
+        }
+    }
+
+    private static void validarUsuarioAtual() {
+        if (usuarioAtual == null) {
+            throw new IllegalStateException("Cadastre um usuário antes de usar esta opção.");
         }
     }
 

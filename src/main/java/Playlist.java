@@ -1,10 +1,10 @@
-public class Playlist {
-    private static final int CAPACIDADE_MAXIMA = 100;
+import java.util.ArrayList;
+import java.util.List;
 
+public class Playlist {
     private final String nome;
     private final Usuario dono;
-    private final Musica[] musicas;
-    private int quantidade;
+    private final ArrayList<Musica> musicas;
 
     public Playlist(String nome, Usuario dono) {
         if (nome == null || nome.trim().isEmpty()) {
@@ -16,8 +16,7 @@ public class Playlist {
 
         this.nome = nome;
         this.dono = dono;
-        this.musicas = new Musica[CAPACIDADE_MAXIMA];
-        this.quantidade = 0;
+        this.musicas = new ArrayList<>();
     }
 
     public String getNome() {
@@ -29,7 +28,7 @@ public class Playlist {
     }
 
     public int getQuantidade() {
-        return quantidade;
+        return musicas.size();
     }
 
     public boolean adicionar(Musica musica) {
@@ -37,52 +36,45 @@ public class Playlist {
             throw new IllegalArgumentException("Música inválida: não pode ser nula.");
         }
 
-        if (quantidade >= CAPACIDADE_MAXIMA) {
-            return false;
-        }
-
-        musicas[quantidade] = musica;
-        quantidade++;
+        musicas.add(musica);
         return true;
     }
 
     public Musica getNaPosicao(int indice) {
         validarIndice(indice);
-        return musicas[indice];
+        return musicas.get(indice);
     }
 
     public boolean removerNaPosicao(int indice) {
         validarIndice(indice);
-
-        for (int i = indice; i < quantidade - 1; i++) {
-            musicas[i] = musicas[i + 1];
-        }
-
-        quantidade--;
-        musicas[quantidade] = null;
+        musicas.remove(indice);
         return true;
     }
 
     public int getDuracaoTotalSegundos() {
         int total = 0;
 
-        for (int i = 0; i < quantidade; i++) {
-            total += musicas[i].getDuracaoSegundos();
+        for (Musica musica : musicas) {
+            total += musica.getDuracaoSegundos();
         }
 
         return total;
     }
 
     public void reproduzirTudo() {
-        for (int i = 0; i < quantidade; i++) {
-            musicas[i].reproduzir();
+        for (Musica musica : musicas) {
+            musica.reproduzir();
         }
     }
 
+    public List<Musica> getMusicas() {
+        return List.copyOf(musicas);
+    }
+
     private void validarIndice(int indice) {
-        if (indice < 0 || indice >= quantidade) {
+        if (indice < 0 || indice >= musicas.size()) {
             throw new IndexOutOfBoundsException(
-                    "Índice inválido: " + indice + ". A playlist possui " + quantidade + " música(s)."
+                    "Índice inválido: " + indice + ". A playlist possui " + musicas.size() + " música(s)."
             );
         }
     }

@@ -1,128 +1,188 @@
-# Sonora — Fase 03: Testes Unitários com JUnit 6
+# Sonora — Fase 05
 
-Projeto derivado da implementação da Fase 02. As classes de produção foram mantidas e a Fase 03 adiciona apenas a infraestrutura de testes, os planos de teste e os testes automatizados.
+Projeto derivado da `sonora-fase03`, evoluído para a Fase 05.
 
-## Estrutura
+## O que foi implementado
+
+- Modelagem UML das associações do Sonora em `docs/diagrama-classes.png`.
+- Troca dos arrays de `Playlist` por `ArrayList<Musica>`.
+- Troca dos arrays de `Plataforma` por `ArrayList<Musica>` e `ArrayList<Usuario>`.
+- Remoção das capacidades fixas de 100 músicas por playlist e 500 músicas/usuários por plataforma.
+- `Usuario` passou a manter `ArrayList<Usuario>` para representar a associação reflexiva de usuários que segue.
+- Implementação de `seguir`, `deixarDeSeguir` e `getQuantidadeSeguindo`.
+- Menu do `App` atualizado para listar usuários, seguir, deixar de seguir e listar os usuários seguidos.
+- Busca de usuários por ID adicionada à `Plataforma` para suportar as operações do menu.
+- Testes JUnit 6 mantidos e adaptados para a nova estrutura, incluindo testes da associação reflexiva e da ausência de limite fixo.
+
+## Diagrama de classes
+
+Arquivo entregue:
 
 ```text
-sonora-fase03/
-├── pom.xml
-├── README.md
-└── src/
-    ├── main/
-    │   └── java/
-    │       ├── App.java
-    │       ├── Musica.java
-    │       ├── Usuario.java
-    │       ├── Playlist.java
-    │       └── Plataforma.java
-    └── test/
-        └── java/
-            ├── MusicaTest.java
-            ├── PlaylistTest.java
-            ├── PlataformaTest.java
-            └── ContadoresIdTest.java
+docs/diagrama-classes.png
 ```
 
-## JUnit
+O diagrama contém os quatro relacionamentos exigidos e também o relacionamento `Playlist -> Musica` já apresentado como exemplo na atividade.
 
-O projeto usa **JUnit 6.0.3** e Maven. O JUnit 6 requer Java 17 ou superior; este projeto está configurado para Java 21. O Surefire é usado para executar os testes. A documentação oficial do JUnit informa suporte ao JUnit Platform pelo Maven Surefire e exige uma versão compatível a partir da linha 3.0.0. 
+### 1. Plataforma e Musica
 
-## Parte 1 — Planos de teste
+| Item | Definição |
+|---|---|
+| Papel em `Plataforma` | `plataforma` |
+| Papel em `Musica` | `acervo` |
+| Nome | `Plataforma cadastra Musica` |
+| Multiplicidade em `Plataforma` | `1` |
+| Multiplicidade em `Musica` | `0..*` |
+| Navegabilidade | `Plataforma -> Musica` |
 
-### PL01 — Validar `Musica.getDuracaoFormatada()`
+**Justificativa:** uma instância de `Plataforma` mantém seu acervo de músicas e pode cadastrar zero ou muitas músicas. Cada música considerada no acervo pertence à plataforma representada no relacionamento. A navegação é da plataforma para as músicas porque é a plataforma que mantém a coleção no código; `Musica` não possui uma referência de volta para `Plataforma`.
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Duração com minutos e segundos | Música de 125 segundos | Deve resultar em `"02:05"` |
-| 2 | Duração redonda em minutos | Música de 90 segundos | Deve resultar em `"01:30"` |
-| 3 | Menos de um minuto, com zero à esquerda | Música de 5 segundos | Deve resultar em `"00:05"` |
-| 4 | Dois dígitos nos minutos | Música de 600 segundos | Deve resultar em `"10:00"` |
-| 5 | Valor logo abaixo de dez minutos | Música de 599 segundos | Deve resultar em `"09:59"` |
+### 2. Plataforma e Usuario
 
-### PL02 — Validar construtor de `Musica` com dados inválidos
+| Item | Definição |
+|---|---|
+| Papel em `Plataforma` | `plataforma` |
+| Papel em `Usuario` | `usuarios` |
+| Nome | `Plataforma registra Usuario` |
+| Multiplicidade em `Plataforma` | `1` |
+| Multiplicidade em `Usuario` | `0..*` |
+| Navegabilidade | `Plataforma -> Usuario` |
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Título vazio deve ser rejeitado | título `""`, artista `"Queen"`, duração `355` | Deve lançar `IllegalArgumentException` |
-| 2 | Título nulo deve ser rejeitado | título `null`, artista `"Queen"`, duração `355` | Deve lançar `IllegalArgumentException` |
-| 3 | Artista vazio deve ser rejeitado | título `"Bohemian Rhapsody"`, artista `""`, duração `355` | Deve lançar `IllegalArgumentException` |
-| 4 | Duração zero deve ser rejeitada | título válido, artista válido, duração `0` | Deve lançar `IllegalArgumentException` |
-| 5 | Duração negativa deve ser rejeitada | título válido, artista válido, duração `-10` | Deve lançar `IllegalArgumentException` |
-| 6 | Dados válidos criam a música | título `"Bohemian Rhapsody"`, artista `"Queen"`, duração `355` | Objeto criado, com id maior que zero |
+**Justificativa:** uma plataforma pode registrar zero ou muitos usuários. O código mantém essa relação em `ArrayList<Usuario>` dentro de `Plataforma`. A navegação é unidirecional porque `Usuario` não precisa conhecer a `Plataforma` à qual está cadastrado.
 
-### PL03 — Validar `Playlist.adicionar(musica)`
+### 3. Usuario e Playlist
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Adicionar música em playlist com espaço | Playlist vazia + uma música válida | Retorna `true` e quantidade passa para `1` |
-| 2 | Adicionar várias músicas em playlist com espaço | Playlist + três músicas válidas | Cada chamada retorna `true` e quantidade chega a `3` |
-| 3 | Adicionar música nula deve ser rejeitado | `playlist.adicionar(null)` | Lança `IllegalArgumentException` e quantidade permanece `0` |
-| 4 | Adicionar até encher a playlist | 100 músicas válidas e uma 101ª música | As 100 primeiras retornam `true`; a 101ª retorna `false`; quantidade permanece `100` |
+| Item | Definição |
+|---|---|
+| Papel em `Usuario` | `dono` |
+| Papel em `Playlist` | `playlists` |
+| Nome | `Usuario cria Playlist` |
+| Multiplicidade em `Usuario` | `1` |
+| Multiplicidade em `Playlist` | `0..*` |
+| Navegabilidade | `Usuario -> Playlist` |
 
-### PL04 — Validar `Playlist.getNaPosicao(indice)`
+**Justificativa:** uma playlist possui exatamente um dono (`dono`), enquanto um usuário pode ser dono de zero ou muitas playlists. No código, `Playlist` mantém a referência para seu `Usuario dono`. A navegação foi representada como `Usuario -> Playlist` para expressar que o usuário cria e possui suas playlists.
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Posição válida devolve a música certa | Playlist com duas músicas, índice `1` | Retorna a segunda música |
-| 2 | Índice negativo | Playlist com uma música, índice `-1` | Lança `IndexOutOfBoundsException` |
-| 3 | Índice além da quantidade | Playlist com uma música, índice `1` | Lança `IndexOutOfBoundsException` |
+### 4. Usuario e Usuario — associação reflexiva
 
-### PL05 — Validar `Playlist.removerNaPosicao(indice)`
+| Item | Definição |
+|---|---|
+| Papel na origem | `seguindo` |
+| Papel no destino | `seguidores` |
+| Nome | `Usuario segue Usuario` |
+| Multiplicidade na origem | `0..*` |
+| Multiplicidade no destino | `0..*` |
+| Navegabilidade | `Usuario -> Usuario` |
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Remoção válida reorganiza o array | Três músicas e remoção da posição `1` | Retorna `true`, quantidade diminui e a terceira música passa para a posição `1` |
-| 2 | Remoção da primeira posição reorganiza as seguintes | Três músicas e remoção da posição `0` | Retorna `true`; a segunda passa para `0` e a terceira para `1` |
-| 3 | Índice inválido | Playlist com uma música, índice `5` | Lança `IndexOutOfBoundsException` |
+**Justificativa:** um usuário pode seguir zero ou muitos outros usuários e também pode ser seguido por zero ou muitos usuários. A associação é reflexiva porque as duas pontas pertencem à classe `Usuario`. No código desta fase, a coleção mantida explicitamente é `seguindo`, portanto a navegação implementada é do usuário para os usuários que ele segue. Não existe uma coleção de seguidores armazenada separadamente.
 
-### PL06 — Validar buscas da `Plataforma`
+### Relacionamento de exemplo — Playlist e Musica
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Música cadastrada é encontrada pelo título | Título de música cadastrada | Retorna a mesma referência da música |
-| 2 | Música cadastrada é encontrada pelo id | ID de música cadastrada | Retorna a mesma referência da música |
-| 3 | Busca por título inexistente | Título que não existe no acervo | Retorna `null` |
-| 4 | Busca por id inexistente | ID que não existe no acervo | Retorna `null` |
+| Item | Definição |
+|---|---|
+| Papel em `Playlist` | `playlist` |
+| Papel em `Musica` | `musicas` |
+| Nome | `Playlist contém Musica` |
+| Multiplicidade em `Playlist` | `1` |
+| Multiplicidade em `Musica` | `0..*` |
+| Navegabilidade | `Playlist -> Musica` |
 
-### PL07 — Validar `Musica.reproduzir()`
+A implementação correspondente é `ArrayList<Musica> musicas` dentro de `Playlist`.
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | Música começa sem reproduções | Nova música | `getReproducoes()` retorna `0` |
-| 2 | Uma reprodução incrementa o contador | Uma chamada a `reproduzir()` | `getReproducoes()` retorna `1` |
-| 3 | Três reproduções incrementam três vezes | Três chamadas a `reproduzir()` | `getReproducoes()` retorna `3` |
+## Associação reflexiva no código
 
-### PL08 — Bônus: contadores de ID
+`Usuario` possui:
 
-| Caso | Descrição | Entrada | Saída esperada |
-|---|---|---|---|
-| 1 | IDs de Música são sequenciais | Criar três músicas | O segundo ID é o primeiro + 1 e o terceiro é o segundo + 1 |
-| 2 | IDs de Música e Usuário são independentes | Criar músicas e usuários alternadamente | Cada classe mantém sua própria sequência de IDs |
-| 3 | Criar Usuário não altera o contador de Música | Criar música, usuário e outra música | O segundo ID de Música é o primeiro + 1 |
+```java
+private final ArrayList<Usuario> seguindo;
+```
 
-> Observação sobre PL08: os testes não exigem que o primeiro ID do processo de testes seja literalmente `1`, porque os campos `static` permanecem vivos durante toda a execução da JVM e os testes do JUnit não devem depender da ordem de execução. O que é verificado é o comportamento essencial: sequência e independência dos contadores.
+E os métodos:
 
-## Parte 2 — Implementação em JUnit 6
+```java
+public void seguir(Usuario outro)
+public void deixarDeSeguir(Usuario outro)
+public int getQuantidadeSeguindo()
+```
 
-Cada caso dos planos foi transformado em um método de teste com `@Test` e `@DisplayName`. Os casos normais usam asserções como `assertEquals`, `assertTrue`, `assertFalse`, `assertNull`, `assertNotNull` e `assertSame`. Os casos de exceção usam `assertThrows` verificando o tipo exato esperado.
+Regras implementadas:
 
-Os cenários repetidos são preparados com `@BeforeEach` nas classes de teste de `Musica`, `Playlist` e `Plataforma`.
+- não permite seguir `null`;
+- não permite seguir a si mesmo;
+- não adiciona o mesmo usuário duas vezes;
+- `deixarDeSeguir` remove o usuário da coleção, caso esteja presente;
+- `getQuantidadeSeguindo()` usa `size()` da `ArrayList`.
+
+## ArrayList
+
+### Playlist
+
+Antes:
+
+```java
+private final Musica[] musicas;
+private int quantidade;
+```
+
+Agora:
+
+```java
+private final ArrayList<Musica> musicas;
+```
+
+A quantidade passou a ser obtida por `musicas.size()`, a inserção usa `add`, a consulta usa `get` e a remoção usa `remove`.
+
+### Plataforma
+
+Antes havia arrays com capacidade fixa de 500 posições.
+
+Agora:
+
+```java
+private final ArrayList<Musica> musicas;
+private final ArrayList<Usuario> usuarios;
+```
+
+As buscas percorrem as coleções com `for-each` e os totais usam `size()`.
+
+### Usuario
+
+A associação reflexiva é armazenada em:
+
+```java
+private final ArrayList<Usuario> seguindo;
+```
+
+## Testes
+
+Os testes anteriores foram adaptados para o novo comportamento. Como não existe mais capacidade fixa, os testes de limite agora verificam que a coleção consegue ultrapassar as antigas capacidades de 100 músicas na playlist e 500 músicas na plataforma.
+
+Também foram adicionados testes para:
+
+- seguir outro usuário;
+- impedir seguir a si mesmo;
+- impedir `null`;
+- não duplicar um usuário seguido;
+- deixar de seguir;
+- tentar deixar de seguir alguém que não está na lista;
+- buscar usuário por ID.
 
 ## Como executar
 
-É necessário ter **Java 21** e **Maven** instalados.
+Requisitos:
 
-Na raiz do projeto:
+- Java 21
+- Maven
+
+Executar os testes:
 
 ```bash
 mvn test
 ```
 
-O resultado esperado é uma execução totalmente verde, sem falhas.
+Executar a aplicação:
 
-Também é possível abrir o projeto em uma IDE com suporte a Maven/JUnit e executar os testes diretamente pela classe ou pelo projeto.
-
-## Alterações na produção
-
-A Fase 03 não reescreve as classes do Sonora. A implementação de `Musica`, `Usuario`, `Playlist`, `Plataforma` e `App` foi trazida da Fase 02. Os testes foram adicionados por cima dela para verificar automaticamente os comportamentos definidos no contrato.
+```bash
+mvn compile
+java -cp target/classes App
+```

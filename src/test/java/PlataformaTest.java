@@ -58,4 +58,47 @@ class PlataformaTest {
         assertTrue(novaPlataforma.cadastrarMusica(new Musica("Nova", "Artista", 120)));
         assertEquals(1, novaPlataforma.getTotalMusicas());
     }
+    @Test
+    @DisplayName("ArrayList permite cadastrar mais de 500 músicas")
+    void devePermitirMaisDeQuinhentasMusicas() {
+        Plataforma novaPlataforma = new Plataforma();
+
+        for (int i = 0; i < 501; i++) {
+            assertTrue(novaPlataforma.cadastrarMusica(
+                    new Musica("Música " + i, "Artista", 120)
+            ));
+        }
+
+        assertEquals(501, novaPlataforma.getTotalMusicas());
+    }
+
+    @Test
+    @DisplayName("ArrayList permite cadastrar mais de 500 usuários")
+    void devePermitirMaisDeQuinhentosUsuarios() {
+        Plataforma novaPlataforma = new Plataforma();
+
+        for (int i = 0; i < 501; i++) {
+            assertTrue(novaPlataforma.cadastrarUsuario(
+                    new Usuario("Usuário " + i, "usuario" + i + "@sonora.com")
+            ));
+        }
+
+        assertEquals(501, novaPlataforma.getTotalUsuarios());
+    }
+
+    @Test
+    @DisplayName("Busca de usuário por id retorna o usuário cadastrado")
+    void deveEncontrarUsuarioPorId() {
+        Usuario usuario = new Usuario("Ana", "ana@sonora.com");
+        plataforma.cadastrarUsuario(usuario);
+
+        assertSame(usuario, plataforma.buscarUsuarioPorId(usuario.getId()));
+    }
+
+    @Test
+    @DisplayName("Busca de usuário por id inexistente retorna null")
+    void deveRetornarNullQuandoUsuarioNaoExiste() {
+        assertNull(plataforma.buscarUsuarioPorId(-999));
+    }
+
 }

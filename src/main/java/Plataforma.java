@@ -1,35 +1,30 @@
-public class Plataforma {
-    private static final int CAPACIDADE_MAXIMA = 500;
+import java.util.ArrayList;
+import java.util.List;
 
-    private final Musica[] musicas;
-    private final Usuario[] usuarios;
-    private int totalMusicas;
-    private int totalUsuarios;
+public class Plataforma {
+    private final ArrayList<Musica> musicas;
+    private final ArrayList<Usuario> usuarios;
 
     public Plataforma() {
-        musicas = new Musica[CAPACIDADE_MAXIMA];
-        usuarios = new Usuario[CAPACIDADE_MAXIMA];
-        totalMusicas = 0;
-        totalUsuarios = 0;
+        musicas = new ArrayList<>();
+        usuarios = new ArrayList<>();
     }
 
     public boolean cadastrarMusica(Musica musica) {
-        if (musica == null || totalMusicas >= CAPACIDADE_MAXIMA) {
+        if (musica == null) {
             return false;
         }
 
-        musicas[totalMusicas] = musica;
-        totalMusicas++;
+        musicas.add(musica);
         return true;
     }
 
     public boolean cadastrarUsuario(Usuario usuario) {
-        if (usuario == null || totalUsuarios >= CAPACIDADE_MAXIMA) {
+        if (usuario == null) {
             return false;
         }
 
-        usuarios[totalUsuarios] = usuario;
-        totalUsuarios++;
+        usuarios.add(usuario);
         return true;
     }
 
@@ -42,9 +37,9 @@ public class Plataforma {
             return null;
         }
 
-        for (int i = 0; i < totalMusicas; i++) {
-            if (musicas[i].getTitulo().equalsIgnoreCase(titulo)) {
-                return musicas[i];
+        for (Musica musica : musicas) {
+            if (musica.getTitulo().equalsIgnoreCase(titulo)) {
+                return musica;
             }
         }
 
@@ -52,9 +47,9 @@ public class Plataforma {
     }
 
     private Musica buscarMusica(int id) {
-        for (int i = 0; i < totalMusicas; i++) {
-            if (musicas[i].getId() == id) {
-                return musicas[i];
+        for (Musica musica : musicas) {
+            if (musica.getId() == id) {
+                return musica;
             }
         }
 
@@ -62,17 +57,38 @@ public class Plataforma {
     }
 
     public int getTotalMusicas() {
-        return totalMusicas;
+        return musicas.size();
     }
 
     public int getTotalUsuarios() {
-        return totalUsuarios;
+        return usuarios.size();
     }
 
     public Musica getMusicaNaPosicao(int indice) {
-        if (indice < 0 || indice >= totalMusicas) {
+        if (indice < 0 || indice >= musicas.size()) {
             throw new IndexOutOfBoundsException("Índice de música inválido: " + indice);
         }
-        return musicas[indice];
+        return musicas.get(indice);
+    }
+
+    public Usuario buscarUsuarioPorId(int id) {
+        for (Usuario usuario : usuarios) {
+            if (usuario.getId() == id) {
+                return usuario;
+            }
+        }
+
+        return null;
+    }
+
+    public Usuario getUsuarioNaPosicao(int indice) {
+        if (indice < 0 || indice >= usuarios.size()) {
+            throw new IndexOutOfBoundsException("Índice de usuário inválido: " + indice);
+        }
+        return usuarios.get(indice);
+    }
+
+    public List<Usuario> getUsuarios() {
+        return List.copyOf(usuarios);
     }
 }
