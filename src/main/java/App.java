@@ -9,6 +9,7 @@ public class App {
 
     public static void main(String[] args) {
         popularAcervo();
+        demonstrarHeranca();
 
         boolean executando = true;
 
@@ -67,9 +68,9 @@ public class App {
 
     private static void popularAcervo() {
         try {
-            plataforma.cadastrarMusica(new Musica("Blinding Lights", "The Weeknd", 200));
-            plataforma.cadastrarMusica(new Musica("Imagine", "John Lennon", 183));
-            plataforma.cadastrarMusica(new Musica("Hotel California", "Eagles", 391));
+            plataforma.cadastrarMusica(new Musica("Blinding Lights", 200, "The Weeknd", "After Hours"));
+            plataforma.cadastrarMusica(new Musica("Imagine", 183, "John Lennon", "Imagine"));
+            plataforma.cadastrarMusica(new Musica("Hotel California", 391, "Eagles", "Hotel California"));
         } catch (IllegalArgumentException e) {
             System.out.println("Erro ao popular acervo: " + e.getMessage());
         }
@@ -85,7 +86,7 @@ public class App {
         System.out.println("5 - Buscar música por título");
         System.out.println("6 - Reproduzir uma música");
         System.out.println("7 - Listar acervo");
-        System.out.println("8 - Demonstração da Fase 02");
+        System.out.println("8 - Demonstração da playlist");
         System.out.println("9 - Listar usuários");
         System.out.println("10 - Seguir usuário");
         System.out.println("11 - Deixar de seguir usuário");
@@ -101,9 +102,12 @@ public class App {
             System.out.print("Artista: ");
             String artista = teclado.nextLine();
 
+            System.out.print("Álbum: ");
+            String album = teclado.nextLine();
+
             int duracao = lerInteiro("Duração em segundos: ");
 
-            Musica musica = new Musica(titulo, artista, duracao);
+            Musica musica = new Musica(titulo, duracao, artista, album);
 
             if (plataforma.cadastrarMusica(musica)) {
                 System.out.println("Música cadastrada com sucesso: " + musica);
@@ -212,8 +216,6 @@ public class App {
             }
 
             musica.reproduzir();
-            System.out.println("Tocando: " + musica.getTitulo());
-            System.out.println("Reproduções: " + musica.getReproducoes());
         } catch (NumberFormatException e) {
             System.out.println("O ID precisa ser um número.");
         } catch (IndexOutOfBoundsException e) {
@@ -262,11 +264,6 @@ public class App {
             System.out.println("Testando reproduzirTudo()...");
             playlist.reproduzirTudo();
 
-            for (int i = 0; i < playlist.getQuantidade(); i++) {
-                Musica musica = playlist.getNaPosicao(i);
-                System.out.println(musica.getTitulo() + ": " + musica.getReproducoes() + " reprodução(ões)");
-            }
-
             System.out.println("Testando índice inválido...");
             try {
                 playlist.getNaPosicao(50);
@@ -283,6 +280,42 @@ public class App {
         }
     }
 
+
+    private static void demonstrarHeranca() {
+        try {
+            System.out.println();
+            System.out.println("=== Demonstração da herança ===");
+
+            Musica musica1 = new Musica(
+                    "Bohemian Rhapsody",
+                    355,
+                    "Queen",
+                    "A Night at the Opera"
+            );
+            Musica musica2 = new Musica(
+                    "Billie Jean",
+                    294,
+                    "Michael Jackson",
+                    "Thriller"
+            );
+            Podcast podcast = new Podcast(
+                    "Tecnologia e Java",
+                    1800,
+                    "Ana Souza",
+                    1
+            );
+
+            musica1.reproduzir();
+            musica2.reproduzir();
+            podcast.reproduzir();
+
+            System.out.println(musica1);
+            System.out.println(musica2);
+            System.out.println(podcast);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Não foi possível demonstrar a herança: " + e.getMessage());
+        }
+    }
 
     private static void listarUsuarios() {
         System.out.println();

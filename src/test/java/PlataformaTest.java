@@ -13,8 +13,8 @@ class PlataformaTest {
     @BeforeEach
     void setUp() {
         plataforma = new Plataforma();
-        musica1 = new Musica("Bohemian Rhapsody", "Queen", 355);
-        musica2 = new Musica("Imagine", "John Lennon", 183);
+        musica1 = new Musica("Bohemian Rhapsody", 355, "Queen", "Álbum");
+        musica2 = new Musica("Imagine", 183, "John Lennon", "Álbum");
         plataforma.cadastrarMusica(musica1);
         plataforma.cadastrarMusica(musica2);
     }
@@ -55,7 +55,7 @@ class PlataformaTest {
         Plataforma novaPlataforma = new Plataforma();
         assertEquals(0, novaPlataforma.getTotalMusicas());
 
-        assertTrue(novaPlataforma.cadastrarMusica(new Musica("Nova", "Artista", 120)));
+        assertTrue(novaPlataforma.cadastrarMusica(new Musica("Nova", 120, "Artista", "Álbum")));
         assertEquals(1, novaPlataforma.getTotalMusicas());
     }
     @Test
@@ -65,7 +65,7 @@ class PlataformaTest {
 
         for (int i = 0; i < 501; i++) {
             assertTrue(novaPlataforma.cadastrarMusica(
-                    new Musica("Música " + i, "Artista", 120)
+                    new Musica("Música " + i, 120, "Artista", "Álbum")
             ));
         }
 

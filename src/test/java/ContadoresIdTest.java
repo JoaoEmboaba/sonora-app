@@ -8,9 +8,9 @@ class ContadoresIdTest {
     @Test
     @DisplayName("IDs de Música são sequenciais")
     void idsDeMusicaDevemSerSequenciais() {
-        Musica musica1 = new Musica("Música 1", "Artista", 100);
-        Musica musica2 = new Musica("Música 2", "Artista", 100);
-        Musica musica3 = new Musica("Música 3", "Artista", 100);
+        Musica musica1 = new Musica("Música 1", 100, "Artista", "Álbum");
+        Musica musica2 = new Musica("Música 2", 100, "Artista", "Álbum");
+        Musica musica3 = new Musica("Música 3", 100, "Artista", "Álbum");
 
         assertEquals(musica1.getId() + 1, musica2.getId());
         assertEquals(musica2.getId() + 1, musica3.getId());
@@ -19,9 +19,9 @@ class ContadoresIdTest {
     @Test
     @DisplayName("IDs de Música e Usuário usam contadores independentes")
     void idsDeMusicaEUsuarioDevemSerIndependentes() {
-        Musica musica1 = new Musica("Música 1", "Artista", 100);
+        Musica musica1 = new Musica("Música 1", 100, "Artista", "Álbum");
         Usuario usuario1 = new Usuario("Usuário 1", "usuario1@sonora.com");
-        Musica musica2 = new Musica("Música 2", "Artista", 100);
+        Musica musica2 = new Musica("Música 2", 100, "Artista", "Álbum");
         Usuario usuario2 = new Usuario("Usuário 2", "usuario2@sonora.com");
 
         assertEquals(musica1.getId() + 1, musica2.getId());
@@ -31,9 +31,9 @@ class ContadoresIdTest {
     @Test
     @DisplayName("Criar Usuário não altera a sequência de IDs de Música")
     void usuarioNaoDeveAlterarContadorDeMusica() {
-        Musica musica1 = new Musica("Música 1", "Artista", 100);
+        Musica musica1 = new Musica("Música 1", 100, "Artista", "Álbum");
         Usuario usuario = new Usuario("Usuário", "usuario@sonora.com");
-        Musica musica2 = new Musica("Música 2", "Artista", 100);
+        Musica musica2 = new Musica("Música 2", 100, "Artista", "Álbum");
 
         assertNotNull(usuario);
         assertEquals(musica1.getId() + 1, musica2.getId());

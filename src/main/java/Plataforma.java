@@ -29,7 +29,12 @@ public class Plataforma {
     }
 
     public Musica buscarMusicaPorId(int id) {
-        return buscarMusica(id);
+        for (Musica musica : musicas) {
+            if (musica.getId() == id) {
+                return musica;
+            }
+        }
+        return null;
     }
 
     public Musica buscarMusica(String titulo) {
@@ -39,16 +44,6 @@ public class Plataforma {
 
         for (Musica musica : musicas) {
             if (musica.getTitulo().equalsIgnoreCase(titulo)) {
-                return musica;
-            }
-        }
-
-        return null;
-    }
-
-    private Musica buscarMusica(int id) {
-        for (Musica musica : musicas) {
-            if (musica.getId() == id) {
                 return musica;
             }
         }
@@ -77,7 +72,6 @@ public class Plataforma {
                 return usuario;
             }
         }
-
         return null;
     }
 

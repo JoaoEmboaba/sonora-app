@@ -16,9 +16,9 @@ class PlaylistTest {
     void setUp() {
         dono = new Usuario("João", "joao@sonora.com");
         playlist = new Playlist("Favoritas", dono);
-        musica1 = new Musica("Música 1", "Artista 1", 100);
-        musica2 = new Musica("Música 2", "Artista 2", 200);
-        musica3 = new Musica("Música 3", "Artista 3", 300);
+        musica1 = new Musica("Música 1", 100, "Artista 1", "Álbum");
+        musica2 = new Musica("Música 2", 200, "Artista 2", "Álbum");
+        musica3 = new Musica("Música 3", 300, "Artista 3", "Álbum");
     }
 
     @Test
@@ -50,7 +50,7 @@ class PlaylistTest {
     @DisplayName("ArrayList permite adicionar mais de 100 músicas sem limite fixo")
     void devePermitirMaisDeCemMusicas() {
         for (int i = 0; i < 101; i++) {
-            assertTrue(playlist.adicionar(new Musica("Música " + i, "Artista", 100)));
+            assertTrue(playlist.adicionar(new Musica("Música " + i, 100, "Artista", "Álbum")));
         }
 
         assertEquals(101, playlist.getQuantidade());
